@@ -1,0 +1,21 @@
+[Unit]
+Description=指数盈利分解 Streamlit App
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/zhishu
+Environment=LANG=zh_CN.UTF-8
+Environment=LC_ALL=zh_CN.UTF-8
+ExecStart=/opt/zhishu/venv/bin/streamlit run 网页展示/app.py \
+    --server.address 127.0.0.1 \
+    --server.port 8501 \
+    --server.headless true \
+    --server.enableCORS false \
+    --server.enableXsrfProtection false
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

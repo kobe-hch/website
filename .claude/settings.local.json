@@ -1,0 +1,13 @@
+{
+  "disabledMcpjsonServers": [
+    "hexin-ifind-ds-stock-mcp",
+    "hexin-ifind-ds-fund-mcp",
+    "hexin-ifind-ds-edb-mcp",
+    "hexin-ifind-ds-news-mcp"
+  ],
+  "permissions": {
+    "allow": [
+      "Bash(node *)"
+    ]
+  }
+}

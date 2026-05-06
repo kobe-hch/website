@@ -80,7 +80,7 @@ def _normalize_wind_codes(codes: list[str] | tuple[str, ...] | str) -> str:
 
 def _wsd_df(res: object) -> pd.DataFrame:
     if res is None:
-        raise RuntimeError("Wind wsd 无返回（网络或服务异常）。")
+        raise RuntimeError("Wind wsd 无返回（当日数据未更新）。")
     err = getattr(res, "ErrorCode", None)
     if err not in (None, 0):
         raise RuntimeError(f"Wind wsd ErrorCode={err}")
@@ -98,7 +98,7 @@ def _wss_sec_names_for_codes(codes: list[str]) -> pd.DataFrame:
     csv = ",".join(codes)
     res = w.wss(csv, "sec_name")
     if res is None:
-        raise RuntimeError("Wind wss 无返回（网络或服务异常）。")
+        raise RuntimeError("Wind wss 无返回（当日数据未更新）。")
     err = getattr(res, "ErrorCode", None)
     if err not in (None, 0):
         raise RuntimeError(f"Wind wss ErrorCode={err}")
