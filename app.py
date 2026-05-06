@@ -6,7 +6,6 @@ from pathlib import Path
 import streamlit as st
 
 from core import (
-    add_index_series,
     build_line_points_export,
     get_chinese_font_status,
     load_data_bundle,
@@ -16,7 +15,6 @@ from core import (
     resolve_target,
     table_pct_chg_and_latest,
     try_fetch_optional_metrics,
-    update_time_series_data,
 )
 
 st.set_page_config(page_title="指数盈利分解", page_icon=":bar_chart:", layout="wide")
@@ -114,56 +112,8 @@ active_font, font_candidates = get_chinese_font_status()
 if active_font is None:
     st.warning("未检测到常用中文字体，图像可能出现中文乱码。建议安装: " + " / ".join(font_candidates))
 
-project_root = Path(__file__).resolve().parent.parent
-
-# ── 侧边栏：数据配置 & 维护 ──────────────────────────────────────────────────
-with st.sidebar:
-    st.markdown("**数据配置**")
-    supplement_today = st.checkbox(
-        "补充最近交易日快照（内存）",
-        value=True,
-        help="勾选后，加载 parquet 后额外从 Wind 拉取「昨日」单日数据并合并到内存，不写回文件。",
-    )
-
-    st.divider()
-    st.markdown("**数据维护**")
-
-    with st.expander("周度更新", expanded=False):
-        st.caption(
-            "将 close / PE_TTM / PB_LF / PB_MRQ_GSD 四张表更新到今日，按周频写回 parquet。"
-        )
-        if st.button("执行周度更新", use_container_width=True):
-            with st.spinner("正在从 Wind 拉取增量数据…"):
-                try:
-                    msg = update_time_series_data(project_root)
-                    st.success(msg)
-                    st.cache_data.clear()
-                    st.rerun()
-                except Exception as exc:  # noqa: BLE001
-                    st.error(f"周度更新失败: {exc}")
-
-    with st.expander("添加新资产", expanded=False):
-        st.caption("输入 Wind 代码（逗号或换行分隔），拉取自 2015-01-01 至今的历史数据。")
-        new_codes_input = st.text_area(
-            "Wind 代码",
-            placeholder="例如:\n603906.SH\n000001.SH",
-            height=88,
-            label_visibility="collapsed",
-        )
-        if st.button("执行添加", use_container_width=True):
-            raw = new_codes_input.replace("\n", ",").replace("，", ",")
-            codes_list = [c.strip() for c in raw.split(",") if c.strip()]
-            if not codes_list:
-                st.warning("请先填写至少一个 Wind 代码。")
-            else:
-                with st.spinner(f"正在添加 {len(codes_list)} 个标的…"):
-                    try:
-                        msg = add_index_series(project_root, codes_list)
-                        st.success(msg)
-                        st.cache_data.clear()
-                        st.rerun()
-                    except Exception as exc:  # noqa: BLE001
-                        st.error(f"添加新资产失败: {exc}")
+project_root = Path(__file__).resolve().parent / "data"
+supplement_today = False
 
 # ── 数据加载 ──────────────────────────────────────────────────────────────────
 @st.cache_data(show_spinner=False)
